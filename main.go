@@ -7,11 +7,10 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strconv"
 )
 
 var (
-	pause = flag.String("pause", "2", "Time in seconds to pause between a words. Use number from 1 to 5")
+	pause = flag.Int("pause", 2, "Time in seconds to pause between a words. Use number from 1 to 5")
 )
 
 func readLines(path string) ([]string, error) {
@@ -39,13 +38,8 @@ func execute(s string) {
 func main() {
 	flag.Parse()
 
-	pause, err := strconv.Atoi(*pause)
-	if err != nil {
-		panic(err)
-	}
-
-	strPause := fmt.Sprintf("|pause%d.mp3|", pause)
-	strPauseLast := fmt.Sprintf("|pause%d.mp3", pause)
+	strPause := fmt.Sprintf("|pause%d.mp3|", *pause)
+	strPauseLast := fmt.Sprintf("|pause%d.mp3", *pause)
 
 	var toSplit string
 	var splitted string
