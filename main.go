@@ -11,17 +11,18 @@ import (
 
 var (
 	pause = flag.Int("pause", 2, "Time in seconds to pause between a words. Use number from 1 to 5")
+	file  = flag.String("file", "words.txt", "File with words.")
 )
 
 func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer f.Close()
 
 	var lines []string
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
@@ -44,7 +45,7 @@ func main() {
 	var toSplit string
 	var splitted string
 
-	lines, err := readLines("words.txt")
+	lines, err := readLines(*file)
 	if err != nil {
 		log.Fatalf("readLines: %s", err)
 	}
