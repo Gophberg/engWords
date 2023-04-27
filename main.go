@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 var (
-	pause = flag.Int("pause", 2, "Time in seconds to pause between a words. Use number from 1 to 5")
-	file  = flag.String("file", "words.txt", "File with words.")
+	pause      = flag.Int("pause", 2, "Time in seconds to pause between a words. Use number from 1 to 5")
+	file       = flag.String("file", "words.txt", "File with words.")
+	rhvProfile = flag.String("profile", "", "Specify a voice profile 'Elena' for Russian or 'slt' for English")
 )
 
 func readLines(path string) ([]string, error) {
@@ -51,7 +53,7 @@ func main() {
 	}
 
 	for i, line := range lines {
-		makeMp3 := fmt.Sprintf(`echo "%s" | RHVoice-test -o outrhv%v.mp3`, line, i)
+		makeMp3 := fmt.Sprintf(`echo "%s" | RHVoice-test --profile "%s" -o outrhv%v.mp3`, line, *rhvProfile, i)
 		execute(makeMp3)
 		repair := fmt.Sprintf(`ffmpeg -y -i outrhv%d.mp3 -ar 24000 -ac 1 -b:a 64k outff%d.mp3`, i, i)
 		execute(repair)
@@ -66,7 +68,8 @@ func main() {
 		splitted += toSplit
 	}
 
-	split := fmt.Sprintf(`ffmpeg -y -i "concat:%s" -ar 24000 -ac 1 -b:a 64k out.mp3`, splitted)
+	filenameWithoutExtension := strings.TrimSuffix(*file, ".txt")
+	split := fmt.Sprintf(`ffmpeg -y -i "concat:%s" -ar 24000 -ac 1 -b:a 64k %s.mp3`, splitted, filenameWithoutExtension)
 	execute(split)
 
 	for j, _ := range lines {
